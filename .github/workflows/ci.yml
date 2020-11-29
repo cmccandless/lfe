@@ -1,0 +1,34 @@
+name: lfe / main
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  ci:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        otp-version:
+          - 22.3
+          - 22.1
+          - 19.0
+          - 18.3
+          - 18.2
+          - 18.0
+          - 17.5
+          - 17.4
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use setup-erlang ${{ matrix.otp-version }}
+        uses: gleam-lang/setup-erlang@57dd49fa2fd2406f836a227c87977466e7270fa4
+        with:
+          otp-version: ${{ matrix.otp-version }}
+
+      - name: Run exercism/lfe ci (runs tests) for all exercises
+        run: make test
